@@ -11,10 +11,10 @@ def dates(
     missing_values: str = "?",
     ignore_missing: bool = True,
 ) -> list:
-    """Returns a list of the dates under a column in a pandas dataframe to be in a uniform format (default is mm/dd/yyyy)
+    """Returns a list of the dates under a column in a pandas dataframe in a uniform format (default is mm/dd/yyyy)
 
     df: DataFrame to use
-    header: Name of column to perform cleaning on
+    header: Name of column in dataframe to use
     f: Format to apply to the dates (using strftime's formating)
     missing_values:"""
     # Stores updated/normalized date values
@@ -33,6 +33,14 @@ def dates(
     return date_list
 
 
+def fix_nan(df: pd.DataFrame, replace_with: Any = "?") -> pd.DataFrame:
+    """Returns a copy of the df the all nan (empty) values in the dataframe being replaced with the given value
+
+    df: DataFrame to use
+    replace_with: Value(s) to replace nan with"""
+    return df.fillna(value=replace_with)
+
+
 def typos(
     df: pd.DataFrame,
     header: str,
@@ -44,7 +52,7 @@ def typos(
     sequence comparison. Returns the altered column as a list. Ignores casing.
 
     df: DataFrame to use
-    header: Name of column in dataframe to perform cleaning on
+    header: Name of column in dataframe to use
     correct_values: exhaustive list of strings with correct/valid entries
     missing_values: value used to denote a missing value
     ignore_missing: determines whether a guess should be performed on missing values or not
