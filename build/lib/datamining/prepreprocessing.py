@@ -1,4 +1,11 @@
 import pandas as pd
+import numpy as np
+from typing import Any
+
+
+def complete_count(df: pd.DataFrame, missing_value: Any = np.nan) -> int:
+    """Returns the number of complete rows (no missing values)"""
+    return len(df) - len(df[df.isin([missing_value,np.nan]).any(axis=1)])
 
 
 def unique_values(df: pd.DataFrame, header: str) -> list:

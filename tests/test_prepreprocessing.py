@@ -1,28 +1,20 @@
 import pytest
 import datamining.prepreprocessing as ppp
 import pandas as pd
+from data_for_tests import DATA_LENGTH, data  # Data for tests
 
-# Num entries per column
-DATA_LENGTH = 10
 
-# Data frame used for testing these functions (DATA_LENGTH entries per column)
-data = {
-    "dates": [
-        "01/17/2000",
-        "January 17, 2000",
-        "Jan 17, 2000",
-        "17 Jan 2000",
-        "17 January 2000",
-        "01-17-2000",
-        "January 17th 2000",
-        "17-01-2000",
-        "17/01/2000",
-        "17th January 2000",
-    ],
-    "typos": ["yes", "y", "yse", "YES", "?", "no", "No", "on", "NO", "?"],
-}
+# Build dataframes
 df: pd.DataFrame = pd.DataFrame(data=data)
 df_copy: pd.DataFrame = pd.DataFrame(data=data)
+
+
+def test_complete_count():
+    #Value testing
+    assert ppp.complete_count(df) == 3
+    assert ppp.complete_count(df,missing_value="?") == 2
+    #Ensure original is unchanged
+    assert df.equals(df_copy)
 
 
 def test_unique_values():
