@@ -1,51 +1,81 @@
-import pandas as pd 
+import pandas as pd
 from dateutil import parser
-from difflib import SequenceMatcher
+from difflib import SequenceMatcher, get_close_matches
 from typing import Any, List
 
-def dates(df: pd.DataFrame, header: str ="date", f: str ="%m/%d/%Y") -> None:
-    '''Updates all dates under the given header, header(str), 
-    in the given dataframe, df(pd.DataFrame), 
-    into the given format, f(str), (must be dateutil compatible).'''
-    #Stores updated/normalized date values
-    date_list=[]
 
-    #Alter the date values in new list
+def dates(
+    df: pd.DataFrame,
+    header: str = "date",
+    f: str = "%m/%d/%Y",
+    missing_values: str = "?",
+    ignore_missing: bool = True,
+) -> list:
+    """Returns a list of the dates under a column in a pandas dataframe to be in a uniform format (default is mm/dd/yyyy)
+
+    df: DataFrame to use
+    header: Name of column to perform cleaning on
+    f: Format to apply to the dates (using strftime's formating)
+    missing_values:"""
+    # Stores updated/normalized date values
+    date_list = []
+
+    # Alter the date values in new list
     for date in df[header]:
-        #Parse date
-        d = (parser.parse(date))
-        #Convert to new format and update date_list
+        if ignore_missing and date == missing_values:
+            date_list.append(date)
+        # Parse date
+        d = parser.parse(date)
+        # Convert to new format and update date_list
         date_list.append(d.strftime(f))
-        
-    #Update Date Values
-    df[header]=date_list
 
-    return
+    # Return Date Values
+    return date_list
 
-def typos(df: pd.DataFrame, header: str, correctValues: List[str]) -> None:
-    '''Compares each value to the values in correct values and matches it to the nearest value using 
-    sequence comparison. Alters the dataframe, df, column, header, to have only values within correctValues'''
+
+def typos(
+    df: pd.DataFrame,
+    header: str,
+    correct_values: List[str],
+    missing_values: str = "?",
+    ignore_missing: bool = True,
+) -> list:
+    """Compares each value to the values in correct values and matches it to the nearest value using
+    sequence comparison. Returns the altered column as a list. Ignores casing.
+
+    df: DataFrame to use
+    header: Name of column in dataframe to perform cleaning on
+    correct_values: exhaustive list of strings with correct/valid entries
+    missing_values: value used to denote a missing value
+    ignore_missing: determines whether a guess should be performed on missing values or not
+    """
     cleaned_list = []
-
+    s = SequenceMatcher(None)
     for v in df[header]:
-        #v is a correct value, no need to clean
-        if v in correctValues:
+        # v is a correct value, no need to clean
+        if v in correct_values:
             cleaned_list.append(v)
-        #Not a correct value, attempt to find best match in given correctValues
+        # Check for missing value
+        elif ignore_missing and v == missing_values:
+            cleaned_list.append(missing_values)
+        # Not a correct value, attempt to find best match in given correctValues
         else:
-            #Track best guess and it's ratio
+            # Track best guess and it's ratio
             best_guess = ""
             best_guess_ratio = -0.1
-            #Find best guess overall
-            for guess in correctValues:
-                ratio = SequenceMatcher(None, v, guess).ratio()
+            # Update Seq1
+            s.set_seq1(v.lower())
+            # Find best guess overall
+            for guess in correct_values:
+                # Update seq2
+                s.set_seq2(guess.lower())
+                # Find ratio and compare if its best guess yet
+                ratio = s.ratio()
                 if ratio > best_guess_ratio:
                     best_guess_ratio = ratio
                     best_guess = guess
-            #Append to cleaned list
+            # Append to cleaned list
             cleaned_list.append(best_guess)
 
-    #Apply changes
-    df[header] = cleaned_list
-
-    return
+    # Return cleaned values
+    return cleaned_list
