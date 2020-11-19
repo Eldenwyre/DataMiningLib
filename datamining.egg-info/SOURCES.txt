@@ -1,0 +1,9 @@
+README.md
+setup.py
+datamining/__init__.py
+datamining/cleandata.py
+datamining.egg-info/PKG-INFO
+datamining.egg-info/SOURCES.txt
+datamining.egg-info/dependency_links.txt
+datamining.egg-info/requires.txt
+datamining.egg-info/top_level.txt
