@@ -33,6 +33,77 @@ def test_fix_nan():
     assert df.equals(df_copy)
 
 
+def test_remove_sparse_rows():
+    # Value Testing
+    #!(These values may need to be changed when data in data_for_tests is changed)
+    _df2 = cleandata.remove_sparse_rows(
+        df, 0.1, missing_values="?", weighting_dict=None
+    )
+    assert _df2.equals(df_copy)
+    _df2 = cleandata.remove_sparse_rows(
+        df, 0.6, missing_values="?", weighting_dict=None
+    )
+    assert _df2.equals(df.drop([9], inplace=False))
+    _df2 = cleandata.remove_sparse_rows(
+        df, 0.8, missing_values="?", weighting_dict=None
+    )
+    assert _df2.equals(df.drop([0, 2, 3, 4, 5, 6, 7, 9], inplace=False))
+    # Value Testing with Dicts
+    _df2 = cleandata.remove_sparse_rows(
+        df, 0.8, missing_values="?", weighting_dict={}, default_weighting=0
+    )
+    assert _df2.equals(df)  # All 0 case
+    _df2 = cleandata.remove_sparse_rows(
+        df,
+        0.8,
+        missing_values="?",
+        weighting_dict={"dates": 1, "typos": 1, "nan1": 1, "nan2": 1},
+        default_weighting=0,
+    )
+    assert _df2.equals(
+        cleandata.remove_sparse_rows(df, 0.8, missing_values="?")
+    )  # Ensuring Dicts don't change results from default
+    _df2 = cleandata.remove_sparse_rows(
+        df, 0.8, missing_values="?", weighting_dict={}, default_weighting=1
+    )
+    assert _df2.equals(
+        cleandata.remove_sparse_rows(df, 0.8, missing_values="?")
+    )  # Ensuring Dicts don't change results from default
+    _df2 = cleandata.remove_sparse_rows(
+        df, 0.8, missing_values="?", weighting_dict={}, default_weighting=2
+    )
+    assert _df2.equals(
+        cleandata.remove_sparse_rows(df, 0.8, missing_values="?")
+    )  # Ensuring Dicts don't change results from default
+    _df2 = cleandata.remove_sparse_rows(
+        df,
+        0.8,
+        missing_values="?",
+        weighting_dict={"dates": 2, "typos": 1, "nan1": 1, "nan2": 1},
+        default_weighting=0,
+    )
+    assert _df2.equals(df.drop([9], inplace=False))
+    _df2 = cleandata.remove_sparse_rows(
+        df,
+        0.8,
+        missing_values="?",
+        weighting_dict={"typos": 1, "nan1": 1, "nan2": 1},
+        default_weighting=0,
+    )
+    assert _df2.equals(df.drop([0, 2, 3, 4, 5, 6, 7, 9], inplace=False))
+    _df2 = cleandata.remove_sparse_rows(
+        df,
+        0.8,
+        missing_values="?",
+        weighting_dict={"typos": 1, "nan1": 10, "nan2": 1},
+        default_weighting=0,
+    )
+    assert _df2.equals(df.drop([3, 5, 6, 9], inplace=False))
+    # TODO:Add tests for negative values if actual support implemented
+    # Ensure original is unchanged
+    assert df.equals(df_copy)
+
+
 def test_typos():
     # Value Testing
     assert list(

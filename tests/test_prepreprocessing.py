@@ -1,5 +1,6 @@
 import pytest
 import datamining.prepreprocessing as ppp
+import numpy as np
 import pandas as pd
 from data_for_tests import DATA_LENGTH, data  # Data for tests
 
@@ -10,10 +11,23 @@ df_copy: pd.DataFrame = pd.DataFrame(data=data)
 
 
 def test_complete_count():
-    #Value testing
+    # Value testing
     assert ppp.complete_count(df) == 3
-    assert ppp.complete_count(df,missing_value="?") == 2
-    #Ensure original is unchanged
+    assert ppp.complete_count(df, missing_value="?") == 2
+    # Ensure original is unchanged
+    assert df.equals(df_copy)
+
+
+def test_count_complete_col():
+    # Value testing
+    assert ppp.count_complete_col(df, "dates", "?") == DATA_LENGTH
+    assert ppp.count_complete_col(df, "typos", "?") == DATA_LENGTH - 2
+    assert ppp.count_complete_col(df, "typos", np.nan) == DATA_LENGTH
+    assert ppp.count_complete_col(df, "nan1", np.nan) == DATA_LENGTH - 4
+    assert ppp.count_complete_col(df, "nan2", "?") == ppp.count_complete_col(
+        df, "nan2", np.nan
+    )
+    # Ensure original is unchanged
     assert df.equals(df_copy)
 
 

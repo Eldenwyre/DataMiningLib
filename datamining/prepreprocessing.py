@@ -4,8 +4,22 @@ from typing import Any
 
 
 def complete_count(df: pd.DataFrame, missing_value: Any = np.nan) -> int:
-    """Returns the number of complete rows (no missing values)"""
-    return len(df) - len(df[df.isin([missing_value,np.nan]).any(axis=1)])
+    """Returns the number of complete rows (no missing values)
+
+    df: Dataframe to use
+    missing_value: Value that indicates a missing value (np.nan still checked)"""
+    return len(df) - len(df[df.isin([missing_value, np.nan]).any(axis=1)])
+
+
+def count_complete_col(
+    df: pd.DataFrame, header: str, missing_value: Any = np.nan
+) -> int:
+    """Returns the number of complete (nonmissing) entries in a column.
+
+    df: Dataframe to use
+    header: Name of column in dataframe to use
+    missing_value: Value that indicates a missing value (np.nan still checked)"""
+    return len(df) - df[header].isin([missing_value, np.nan]).sum()
 
 
 def unique_values(df: pd.DataFrame, header: str) -> list:
