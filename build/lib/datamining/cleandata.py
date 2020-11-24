@@ -43,6 +43,22 @@ def fix_nan(df: pd.DataFrame, replace_with: Any = "?") -> pd.DataFrame:
 
 
 def remove_sparse_rows(
+    df: pd.DataFrame,
+    minimum_ratio: float,
+    missing_values: Any = np.nan,
+    weighting_dict: Dict[Any, float] = None,
+    default_weighting: float = 0,
+) -> pd.DataFrame:
+    """Returns a copy of a pandas dataframe with rows that have a ratio of filled values less than the minimum ratio.
+    Can be given a weighted dict to prioritize certain rows.
+
+    df: Dataframe to use
+    minimum_ratio: The ratio the row much at least achieve to not be dropped
+    missing_values (optional): Alternative value for missing value (np.nan is still checked)
+    weighted_dict (optional): Dict used to weight the importance of the columns, for example...
+        {"A":2,"B":1,"C":3} would weight A twice as much as B, and C thrice as much as B.
+        Any values not in the dictionary will be weighted with default_weight_value
+        Weights of 0 will result in the column being ignored
         All columns being ignored results in the original being returned
         If weights are present, the value compared to minimum_ratio is sum_of_row / sum_of_weights.
         Use negative weights at your own risk (Don't).
