@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 setup(
     name="datamining",
     packages=find_packages(include=["datamining"]),
-    version="0.2.1",
+    version="0.3.0",
     description="",
     author="Eldenwyre",
     license="MIT",

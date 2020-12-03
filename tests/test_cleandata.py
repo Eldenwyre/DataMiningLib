@@ -13,10 +13,10 @@ df_copy: pd.DataFrame = pd.DataFrame(data=data)
 def test_dates():
     # Value testing
     assert (
-        list(cleandata.dates(df, "dates", f="%m/%d/%Y")) == ["01/17/2000"] * DATA_LENGTH
+        list(cleandata.dates(df["dates"], f="%m/%d/%Y")) == ["01/17/2000"] * DATA_LENGTH
     )
-    assert list(cleandata.dates(df, "dates", f="%m/%Y")) == ["01/2000"] * DATA_LENGTH
-    assert list(cleandata.dates(df, "dates", f="HAHA")) == ["HAHA"] * DATA_LENGTH
+    assert list(cleandata.dates(df["dates"], f="%m/%Y")) == ["01/2000"] * DATA_LENGTH
+    assert list(cleandata.dates(df["dates"], f="HAHA")) == ["HAHA"] * DATA_LENGTH
     # Ensure original is unchanged
     assert df.equals(df_copy)
 
@@ -108,19 +108,19 @@ def test_typos():
     # Value Testing
     assert list(
         cleandata.typos(
-            df, "typos", ["yes", "no"], missing_values="?", ignore_missing=True
+            df["typos"], ["yes", "no"], missing_values="?", ignore_missing=True
         )
     ) == ["yes", "yes", "yes", "yes", "?", "no", "no", "no", "no", "?"]
     assert list(
         cleandata.typos(
-            df, "typos", ["Y", "N"], missing_values="?", ignore_missing=True
+            df["typos"], ["Y", "N"], missing_values="?", ignore_missing=True
         )
     ) == ["Y", "Y", "Y", "Y", "?", "N", "N", "N", "N", "?"]
     # Make sure if missing values aren't ignored, they are replaced
     with pytest.raises(ValueError):
         list(
             cleandata.typos(
-                df, "typos", ["yes", "no"], missing_values="?", ignore_missing=False
+                df["typos"], ["yes", "no"], missing_values="?", ignore_missing=False
             )
         ).index("?")
     # Ensure original is unchanged

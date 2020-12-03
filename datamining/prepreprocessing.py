@@ -11,31 +11,26 @@ def complete_count(df: pd.DataFrame, missing_value: Any = np.nan) -> int:
     return len(df) - len(df[df.isin([missing_value, np.nan]).any(axis=1)])
 
 
-def count_complete_col(
-    df: pd.DataFrame, header: str, missing_value: Any = np.nan
-) -> int:
+def count_complete_col(col: pd.Series, missing_value: Any = np.nan) -> int:
     """Returns the number of complete (nonmissing) entries in a column.
 
-    df: Dataframe to use
-    header: Name of column in dataframe to use
+    col: col of dataframe to use method
     missing_value: Value that indicates a missing value (np.nan still checked)"""
-    return len(df) - df[header].isin([missing_value, np.nan]).sum()
+    return len(col) - col.isin([missing_value, np.nan]).sum()
 
 
-def unique_values(df: pd.DataFrame, header: str) -> list:
+def unique_values(col: pd.Series) -> list:
     """Returns a list of the unique values for a column in a pandas dataframe
 
-    df: DataFrame to use
-    header: Name of column in dataframe to use"""
-    return list(df[header].unique())
+    col: col of dataframe to use method"""
+    return list(col.unique())
 
 
-def unique_values_count(df: pd.DataFrame, header: str) -> int:
+def unique_values_count(col: pd.Series) -> int:
     """Returns the count of the unique values for a column in a pandas dataframe
 
-    df: DataFrame to use
-    header: Name of column in dataframe to use"""
-    return len(df[header].unique())
+    col: col of dataframe to use method"""
+    return len(col.unique())
 
 
 def data_frame_analysis(df: pd.DataFrame, nominal_cutoff: float = 0.05) -> dict:

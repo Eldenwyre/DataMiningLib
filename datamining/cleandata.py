@@ -6,23 +6,22 @@ from typing import Any, List, Dict
 
 
 def dates(
-    df: pd.DataFrame,
-    header: str = "date",
+    col: pd.Series,
     f: str = "%m/%d/%Y",
     missing_values: str = np.nan,
     ignore_missing: bool = True,
 ) -> list:
     """Returns a list of the dates under a column in a pandas dataframe in a uniform format (default is mm/dd/yyyy)
 
-    df: DataFrame to use
-    header: Name of column in dataframe to use
+    col: dataframe column to apply the method
     f: Format to apply to the dates (using strftime's formating)
-    missing_values:"""
+    missing_values (optional): Value to ignore if ignore_missing is True
+    ignore_missing (optional): Default to true, ignores missing values when formatting dates (and np.nan)"""
     # Stores updated/normalized date values
     date_list = []
 
     # Alter the date values in new list
-    for date in df[header]:
+    for date in col:
         if ignore_missing and date in [missing_values, np.nan]:
             date_list.append(date)
         # Parse date
@@ -113,8 +112,7 @@ def remove_sparse_rows(
 
 
 def typos(
-    df: pd.DataFrame,
-    header: str,
+    col: pd.Series,
     correct_values: List[str],
     missing_values: str = np.nan,
     ignore_missing: bool = True,
@@ -122,15 +120,14 @@ def typos(
     """Compares each value to the values in correct values and matches it to the nearest value using
     sequence comparison. Returns the altered column as a list. Ignores casing.
 
-    df: DataFrame to use
-    header: Name of column in dataframe to use
+    col: dataframe column to apply the method
     correct_values: exhaustive list of strings with correct/valid entries
     missing_values: value used to denote a missing value
     ignore_missing: determines whether a guess should be performed on missing values or not
     """
     cleaned_list = []
     s = SequenceMatcher(None)
-    for v in df[header]:
+    for v in col:
         # v is a correct value, no need to clean
         if v in correct_values:
             cleaned_list.append(v)
