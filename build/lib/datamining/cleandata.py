@@ -26,21 +26,21 @@ def bounding(
         if upper_bound is not None:
             return col.map(
                 lambda x: x
-                if (x == missing_values) or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
+                if (x == missing_values and ignore_missing) or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
                 else (replace_with if (float(x) < lower_bound or float(x) > upper_bound) else x)
             )
         #Only Lower
         else:
             return col.map(
                 lambda x: x
-                if (x == missing_values) or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
+                if (x == missing_values and ignore_missing) or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
                 else (replace_with if (float(x) < lower_bound) else x)
             )
     # Only upper
     elif upper_bound is not None:
         return col.map(
             lambda x: x
-            if (x == missing_values) or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
+            if (x == missing_values and ignore_missing) or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
             else (replace_with if (float(x) > upper_bound) else x)
         )
     # No bounds given, just return col
