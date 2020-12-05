@@ -10,6 +10,24 @@ df: pd.DataFrame = pd.DataFrame(data=data)
 df_copy: pd.DataFrame = pd.DataFrame(data=data)
 
 
+def test_bounding():
+    test_list = [-10,"-9",0,"string", 1, 2, "3", 4, "5.5", 20, "-1"]
+    test_data = pd.Series(test_list)
+    # Value testing
+    #Test Maintaining Values if no bounds given
+    assert (cleandata.bounding(test_data).equals(test_data))
+    #Test lower bounds
+    assert (list(cleandata.bounding(test_data, lower_bound=1.5, replace_with="R")) == ["R","R","R","string", "R", 2, "3", 4, "5.5", 20, "R"])
+    #Test upper bounds
+    assert (list(cleandata.bounding(test_data,upper_bound=0,replace_with="R")) == [-10,"-9",0,"string", "R", "R", "R", "R", "R", "R", "-1"])
+    #Test upper and lower bounds
+    assert (list(cleandata.bounding(test_data,lower_bound=0, upper_bound=5,replace_with="R")) == ["R","R",0,"string", 1, 2, "3", 4, "R", "R", "R"])
+    #Test ignoring missing values
+    assert (list(cleandata.bounding(test_data, lower_bound=0, upper_bound=5, replace_with="R",missing_values=-10,ignore_missing=True)) == [-10,"R",0,"string", 1, 2, "3", 4, "R", "R", "R"])
+    #Ensure original is unchanged
+    assert test_data.equals(pd.Series(test_list))
+
+
 def test_dates():
     # Value testing
     assert (

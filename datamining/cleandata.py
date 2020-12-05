@@ -5,6 +5,49 @@ from difflib import SequenceMatcher, get_close_matches
 from typing import Any, List, Dict
 
 
+def bounding(
+    col: pd.Series,
+    lower_bound: float = None,
+    upper_bound: float = None,
+    replace_with=np.nan,
+    missing_values=np.nan,
+    ignore_missing: bool = True,
+) -> list:
+    """Returns a list that replaces any values outside of the given bounds (assumes numerical data) with the replacement value
+    
+    col: dataframe column to apply the method
+    lower_bound: Defaults to None, if none given, ignores lower bound.
+    upper_bound: Defaults to None, if none given, ignores upper bound.
+    replace_with: Defaults to np.nan, replaces values that are out of the bounds with this value.
+    missing_values (optional): Value to ignore if ignore_missing is True
+    ignore_missing (optional): Default to true, ignores missing values when formatting dates (and np.nan)"""
+    if lower_bound is not None:
+        #Upper and lower
+        if upper_bound is not None:
+            return col.map(
+                lambda x: x
+                if (x == missing_values) or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
+                else (replace_with if (float(x) < lower_bound or float(x) > upper_bound) else x)
+            )
+        #Only Lower
+        else:
+            return col.map(
+                lambda x: x
+                if (x == missing_values) or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
+                else (replace_with if (float(x) < lower_bound) else x)
+            )
+    # Only upper
+    elif upper_bound is not None:
+        return col.map(
+            lambda x: x
+            if (x == missing_values) or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
+            else (replace_with if (float(x) > upper_bound) else x)
+        )
+    # No bounds given, just return col
+    else:
+        return col
+
+
 def dates(
     col: pd.Series,
     f: str = "%m/%d/%Y",
