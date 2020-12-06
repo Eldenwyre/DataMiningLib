@@ -11,20 +11,55 @@ df_copy: pd.DataFrame = pd.DataFrame(data=data)
 
 
 def test_bounding():
-    test_list = [-10,"-9",0,"string", 1, 2, "3", 4, "5.5", 20, "-1"]
+    test_list = [-10, "-9", 0, "string", 1, 2, "3", 4, "5.5", 20, "-1"]
     test_data = pd.Series(test_list)
     # Value testing
-    #Test Maintaining Values if no bounds given
-    assert (cleandata.bounding(test_data).equals(test_data))
-    #Test lower bounds
-    assert (list(cleandata.bounding(test_data, lower_bound=1.5, replace_with="R")) == ["R","R","R","string", "R", 2, "3", 4, "5.5", 20, "R"])
-    #Test upper bounds
-    assert (list(cleandata.bounding(test_data,upper_bound=0,replace_with="R")) == [-10,"-9",0,"string", "R", "R", "R", "R", "R", "R", "-1"])
-    #Test upper and lower bounds
-    assert (list(cleandata.bounding(test_data,lower_bound=0, upper_bound=5,replace_with="R")) == ["R","R",0,"string", 1, 2, "3", 4, "R", "R", "R"])
-    #Test ignoring missing values
-    assert (list(cleandata.bounding(test_data, lower_bound=0, upper_bound=5, replace_with="R",missing_values=-10,ignore_missing=True)) == [-10,"R",0,"string", 1, 2, "3", 4, "R", "R", "R"])
-    #Ensure original is unchanged
+    # Test Maintaining Values if no bounds given
+    assert cleandata.bounding(test_data).equals(test_data)
+    # Test lower bounds
+    assert list(cleandata.bounding(test_data, lower_bound=1.5, replace_with="R")) == [
+        "R",
+        "R",
+        "R",
+        "string",
+        "R",
+        2,
+        "3",
+        4,
+        "5.5",
+        20,
+        "R",
+    ]
+    # Test upper bounds
+    assert list(cleandata.bounding(test_data, upper_bound=0, replace_with="R")) == [
+        -10,
+        "-9",
+        0,
+        "string",
+        "R",
+        "R",
+        "R",
+        "R",
+        "R",
+        "R",
+        "-1",
+    ]
+    # Test upper and lower bounds
+    assert list(
+        cleandata.bounding(test_data, lower_bound=0, upper_bound=5, replace_with="R")
+    ) == ["R", "R", 0, "string", 1, 2, "3", 4, "R", "R", "R"]
+    # Test ignoring missing values
+    assert list(
+        cleandata.bounding(
+            test_data,
+            lower_bound=0,
+            upper_bound=5,
+            replace_with="R",
+            missing_values=-10,
+            ignore_missing=True,
+        )
+    ) == [-10, "R", 0, "string", 1, 2, "3", 4, "R", "R", "R"]
+    # Ensure original is unchanged
     assert test_data.equals(pd.Series(test_list))
 
 
@@ -49,6 +84,17 @@ def test_fix_nan():
     assert list(_df2["nan2"]) == ["?", 1, "?", 3, 4, 5, 6, "?", 8, 9]
     # Ensure original is unchanged
     assert df.equals(df_copy)
+
+
+def test_normalize():
+    # Value Testing
+    assert cleandata.normalize(
+        [0, 1, 2, "np.nan", 4, "np.nan", "np.nan", 7, 8, "np.nan"]
+    ) == [0, 0.125, 0.25, "np.nan", 0.5, "np.nan", "np.nan", 0.875, 1, "np.nan"]
+    # Ensure original is unchanged
+    x = [0, 0, "?", "1", 3, 4, 1]
+    assert cleandata.normalize(x) == [0, 0, "?", 0.25, 0.75, 1, 0.25]
+    assert x == [0, 0, "?", "1", 3, 4, 1]
 
 
 def test_remove_sparse_rows():

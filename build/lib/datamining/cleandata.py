@@ -22,25 +22,32 @@ def bounding(
     missing_values (optional): Value to ignore if ignore_missing is True
     ignore_missing (optional): Default to true, ignores missing values when formatting dates (and np.nan)"""
     if lower_bound is not None:
-        #Upper and lower
+        # Upper and lower
         if upper_bound is not None:
             return col.map(
                 lambda x: x
-                if (x == missing_values and ignore_missing) or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
-                else (replace_with if (float(x) < lower_bound or float(x) > upper_bound) else x)
+                if (x == missing_values and ignore_missing)
+                or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
+                else (
+                    replace_with
+                    if (float(x) < lower_bound or float(x) > upper_bound)
+                    else x
+                )
             )
-        #Only Lower
+        # Only Lower
         else:
             return col.map(
                 lambda x: x
-                if (x == missing_values and ignore_missing) or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
+                if (x == missing_values and ignore_missing)
+                or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
                 else (replace_with if (float(x) < lower_bound) else x)
             )
     # Only upper
     elif upper_bound is not None:
         return col.map(
             lambda x: x
-            if (x == missing_values and ignore_missing) or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
+            if (x == missing_values and ignore_missing)
+            or not (str(x).lstrip("-").replace(".", "", 1).isdigit())
             else (replace_with if (float(x) > upper_bound) else x)
         )
     # No bounds given, just return col
@@ -82,6 +89,36 @@ def fix_nan(df: pd.DataFrame, replace_with: Any = "?") -> pd.DataFrame:
     df: DataFrame to use
     replace_with: Value(s) to replace nan with"""
     return df.fillna(value=replace_with)
+
+
+def normalize(col: pd.Series, missing_values=np.nan, ignore_missing=True) -> list:
+    """Returns a list of the normalized values in the given pandas series.
+    
+    col: Pandas series (dataframe column) to use
+    missing_values (optional): Value to ignore if ignore_missing is True
+    ignore_missing (optional): Default to true, ignores missing values when formatting dates (and np.nan)"""
+    # Find min/max
+    min: float = None
+    max: float = None
+    for v in col:
+        try:
+            x = float(v)
+            if min == None or x < min:
+                min = x
+            if max == None or x > max:
+                max = x
+        except:
+            continue
+
+    # Lambda for mapping
+    f = (
+        lambda x: x
+        if not (str(x).lstrip("-").replace(".", "", 1).isdigit())
+        else ((float(x) - min) / (max - min))
+    )
+
+    # Return normalized values
+    return list(map(f, col))
 
 
 def remove_sparse_rows(
