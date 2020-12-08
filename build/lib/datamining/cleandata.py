@@ -103,9 +103,9 @@ def normalize(col: pd.Series, missing_values=np.nan, ignore_missing=True) -> lis
     for v in col:
         try:
             x = float(v)
-            if min == None or x < min:
+            if ( min == None and not np.isnan(x) )or x < min:
                 min = x
-            if max == None or x > max:
+            if ( max == None and not np.isnan(x) )or x > max:
                 max = x
         except:
             continue
